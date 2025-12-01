@@ -54,7 +54,7 @@ void Ball::setupData(GLenum shapeType) {
 
     glBindVertexArray(0);
 
-    firstFrame = glfwGetTime();
+    firstFrame = float(glfwGetTime());
 }
 
 void Ball::drawShape(Shader& shader) {
@@ -152,19 +152,16 @@ void Ball::handlePaddleCollisions(Paddle paddle, int& score) {
         float distSq = glm::dot(diff, diff);
 
         if (distSq <= radius * radius) {
-            float currentFrame = glfwGetTime();
+            float currentFrame = float(glfwGetTime());
 
             if (currentFrame - firstFrame >= paddleCollisionDelay) {
-                if (vel.x < 0.0f) {
-                    std::cout << "Red: " << i << std::endl;
-                }
-                else {
-                    std::cout << "Blue: " << i << std::endl;
+                if (currentSpeed < speed * 1.5f) {
+                    currentSpeed += 0.00001f;
                 }
 
-                vel.x *= -1.0f;
+                vel.x = (vel.x > 0 ? -1.0f : 1.0f) * currentSpeed;
+                vel.y = RandomNumGen::GenerateFloat(-currentSpeed, currentSpeed);
 
-                vel.y = RandomNumGen::GenerateFloat(-speed, speed);
                 score++;
 
                 firstFrame = currentFrame;

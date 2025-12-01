@@ -36,6 +36,7 @@ public:
     int modelLoc;
 
     float speed = 0.00075f;
+    float currentSpeed = speed;
 
     glm::vec3 size = glm::vec3(radius * 2.0f, radius * 2.0f, 0.0f);
 

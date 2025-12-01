@@ -1,6 +1,8 @@
 #pragma once
 
+#include <iostream>
 #include "Ball.h"
+#include "Score.h"
 
 class Pong {
 public:

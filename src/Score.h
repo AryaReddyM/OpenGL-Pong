@@ -3,7 +3,7 @@
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
-#include <glad/glad.h> // Include glad or glew
+#include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -26,7 +26,6 @@ public:
     unsigned int shaderProgram;
 
     TextRenderer(unsigned int screenWidth, unsigned int screenHeight, const std::string& fontPath) {
-        // Vertex Shader embedded in the class
         const char* vertexShaderSource = R"glsl(
             #version 330 core
             layout (location = 0) in vec4 vertex; // <vec2 pos, vec2 tex>
@@ -38,7 +37,6 @@ public:
             }
         )glsl";
 
-        // Fragment Shader embedded in the class
         const char* fragmentShaderSource = R"glsl(
             #version 330 core
             in vec2 TexCoords;
@@ -51,7 +49,6 @@ public:
             }
         )glsl";
 
-        // 1. Compile shaders
         unsigned int vertex, fragment;
         int success;
         char infoLog[512];
@@ -59,7 +56,7 @@ public:
         vertex = glCreateShader(GL_VERTEX_SHADER);
         glShaderSource(vertex, 1, &vertexShaderSource, NULL);
         glCompileShader(vertex);
-        // Check for compile errors
+
         glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
         if (!success) {
             glGetShaderInfoLog(vertex, 512, NULL, infoLog);
@@ -69,7 +66,7 @@ public:
         fragment = glCreateShader(GL_FRAGMENT_SHADER);
         glShaderSource(fragment, 1, &fragmentShaderSource, NULL);
         glCompileShader(fragment);
-        // Check for compile errors
+
         glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
         if (!success) {
             glGetShaderInfoLog(fragment, 512, NULL, infoLog);
@@ -80,7 +77,7 @@ public:
         glAttachShader(shaderProgram, vertex);
         glAttachShader(shaderProgram, fragment);
         glLinkProgram(shaderProgram);
-        // Check for linking errors
+
         glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
         if (!success) {
             glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
@@ -90,12 +87,12 @@ public:
         glDeleteShader(vertex);
         glDeleteShader(fragment);
 
-        // 2. Setup projection matrix (orthographic for 2D)
+
         glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(screenWidth), 0.0f, static_cast<float>(screenHeight));
         glUseProgram(shaderProgram);
         glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
-        // 3. Initialize FreeType
+
         FT_Library ft;
         if (FT_Init_FreeType(&ft)) {
             std::cout << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
@@ -108,9 +105,9 @@ public:
             return;
         }
 
-        FT_Set_Pixel_Sizes(face, 0, 48); // Set font size
+        FT_Set_Pixel_Sizes(face, 0, 48);
 
-        glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // Disable byte-alignment restriction
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
         // Load first 128 ASCII characters
         for (unsigned char c = 0; c < 128; c++) {
@@ -132,7 +129,7 @@ public:
                 GL_UNSIGNED_BYTE,
                 face->glyph->bitmap.buffer
             );
-            // Set texture options
+
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -149,7 +146,7 @@ public:
         glBindTexture(GL_TEXTURE_2D, 0);
         FT_Done_Face(face);
         FT_Done_FreeType(ft);
-                // 4. Configure VAO/VBO for rendering quads
+
         glGenVertexArrays(1, &VAO);
         glGenBuffers(1, &VBO);
         glBindVertexArray(VAO);
@@ -162,7 +159,6 @@ public:
     }
 
     void RenderText(std::string text, float x, float y, float scale, glm::vec3 color) {
-        // Enable blending for transparency
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -171,7 +167,6 @@ public:
         glActiveTexture(GL_TEXTURE0);
         glBindVertexArray(VAO);
 
-        // Iterate through all characters
         std::string::const_iterator c;
         for (c = text.begin(); c != text.end(); c++) {
             Character ch = Characters[*c];
@@ -182,7 +177,6 @@ public:
             float w = ch.Size.x * scale;
             float h = ch.Size.y * scale;
 
-            // Update VBO for each character's quad
             float vertices[6][4] = {
                 { xpos,     ypos + h,   0.0f, 0.0f },
                 { xpos,     ypos,       0.0f, 1.0f },
@@ -193,22 +187,19 @@ public:
                 { xpos + w, ypos + h,   1.0f, 0.0f }
             };
 
-            // Render glyph texture over quad
             glBindTexture(GL_TEXTURE_2D, ch.TextureID);
             glBindBuffer(GL_ARRAY_BUFFER, VBO);
             glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
             glBindBuffer(GL_ARRAY_BUFFER, 0);
             glDrawArrays(GL_TRIANGLES, 0, 6);
 
-            // Advance cursor for next glyph (advance is in 1/64 pixels)
             x += (ch.Advance >> 6) * scale;
         }
         glBindVertexArray(0);
         glBindTexture(GL_TEXTURE_2D, 0);
 
-        // Disable blending when done
         glDisable(GL_BLEND);
     }
 };
 
-#endif // TEXTRENDERER_H
+#endif

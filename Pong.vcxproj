@@ -585,7 +585,6 @@
     <None Include="lib\glfw3.dll" />
     <None Include="src\shader.fs" />
     <None Include="src\shader.vs" />
-    <None Include="src\textShader.fs" />
     <None Include="x64\Debug\freetype.dll" />
     <None Include="x64\Debug\Pong.exe" />
     <None Include="x64\Debug\Pong.pdb" />

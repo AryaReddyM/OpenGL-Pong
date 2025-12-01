@@ -1372,7 +1372,6 @@
     <None Include="x64\Debug\Pong.exe" />
     <None Include="x64\Debug\Pong.pdb" />
     <None Include="x64\Debug\freetype.dll" />
-    <None Include="src\textShader.fs" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="lib\glfw3.lib" />
