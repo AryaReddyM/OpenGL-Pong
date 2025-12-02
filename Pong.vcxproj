@@ -583,6 +583,7 @@
     <None Include="include\glm\gtx\vector_query.inl" />
     <None Include="include\glm\gtx\wrap.inl" />
     <None Include="lib\glfw3.dll" />
+    <None Include="Pong.slnx" />
     <None Include="src\shader.fs" />
     <None Include="src\shader.vs" />
     <None Include="x64\Debug\freetype.dll" />
